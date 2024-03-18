@@ -1,63 +1,66 @@
 'use client';
-import { fetchCityByCoords } from '@/lib/data';
-import { useState, useEffect } from 'react'
+
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce'
+import { useState, useRef } from 'react'
+import { fetchCityFromList } from '@/lib/data'
 
 export type City = {
-  name: string,
-  local_names: {
-    [key: string]: string
-  },
-
-  lat: number,
-  lon: number,
-  country: string,
-  state: string
+  id: number
+  name: string
+  country: string
+  state?: string
+  coord: {
+    lat: number
+    lon: number
+  }
 }
 
+
 export default function Searchbar() {
-  const [units, setUnits] = useState('metric')
-  const [city, setCity] = useState({} as City)
-  const buttonText = units === 'metric' ? 'Metric' : 'Imperial';
-  const toggleUnits = () => {
-    document.cookie = `units=${units}; expires=Fri, 31 Dec 3000 23:59:59 GMT`;
-    setUnits(units === 'metric' ? 'imperial': 'metric')
+  const [cities, setCities] = useState([])
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const { replace } = useRouter()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleSearch = useDebouncedCallback((term: string) => {
+    fetchCityFromList(term).then((data) => {
+      setCities(data)
+    })
+  }, 300)
+
+  const handleSelect = (id: number) => {
+   const params = new URLSearchParams(searchParams)
+    params.set('city', id.toString())
+    replace(`${pathname}?${params}`)
+
+    setCities([])
+    inputRef.current && (inputRef.current.value = '')
   }
-  const updateQueryParam = () => {
-
-  }
-
-  const locate = async () => {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const response = await fetchCityByCoords(position.coords.latitude, position.coords.longitude);
-      setCity(response[0]);
-    }, (err) => {
-      console.error(err);
-    });
-  }
-
-  // Runs once when the component is mounted
-  useEffect(() => {
-    locate();
-  }, [])
-
-  // Runs when the units state changes
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-    queryParams.set('units', units);
-    const newUrl = `${window.location.pathname}?${queryParams.toString()}`;
-    window.history.replaceState(null, '', newUrl);
-  }, [units])
-
-
   return (
-    <nav>
-      <input type="search" placeholder="Search City" id="citySearch" />
-      <button onClick={()=>alert('search')} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>Search</button>
-      <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={locate}>Geolocate</button>
-      <button onClick={toggleUnits} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>{buttonText}</button>
+    <>
+    <div className="relative flex flex-1 flex-shrink-0">
+      <label htmlFor="search" className="sr-only">
+        Search
+      </label>
+      <input
+        ref={inputRef}
+        className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+        placeholder="Search for a city"
+        id="citySearch"
+        onChange={(e) => handleSearch(e.target.value)}
+      />
+      <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
       <br />
-      {/* <p>{JSON.stringify(coords)}</p> */}
-      <p>{JSON.stringify(city)}</p>
-    </nav>
-  )
+
+    </div>
+    <ul>
+    {cities.map((city: City, idx: number) => (
+      <li key={city.id} onClick={()=>handleSelect(city.id)}>{city.name} {city.state} {city.country}</li>
+    ))}
+  </ul>
+  </>
+  );
 }

@@ -7,3 +7,7 @@ export const degToCompass = (num: number): string => {
 }
 
 export const kelvinToCelsius = (kelvin: number) => Math.round(kelvin - 273.15);
+
+export const kelvinToFahrenheit = (kelvin: number) => Math.round((kelvin - 273.15) * 9/5 + 32);
+
+export const metersToFeet = (meters: number) => Math.round(meters * 3.281);
