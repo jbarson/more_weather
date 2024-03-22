@@ -10,7 +10,7 @@ export default async function Forecast({id}: {id: number}) {
 
   return (
     <div>
-      <h3 className="mb-4 text-xl font-bold leading-none tracking-tight text-gray-900">10-day forecast</h3>
+      <h3 className="mb-4 mt-4 text-xl font-bold leading-none tracking-tight text-gray-900">10-day forecast</h3>
         <ul className="bg-white p-2 rounded-lg border border-gray-200 shadow">
           {dailyData.list.map((day: {dt: number, temp: {day: number}, weather: {icon: string, description: string}[]}, idx: number) => {
             return <li key={idx} className="flex py-4 items-center  hover:bg-gray-100">

@@ -2,10 +2,9 @@ import Forecast from "@/ui/Forecast";
 import Searchbar from "@/ui/Searchbar";
 import { Suspense } from "react";
 import CityWeather from "@/ui/CityWeather";
+import type { SearchParams } from "@/lib/types"
 
-export type SearchParams = {
-  city: string;
-}
+
 
 export default async function Home({
   searchParams,
