@@ -1,3 +1,9 @@
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 
 export const degToCompass = (num: number): string => {
@@ -10,4 +16,4 @@ export const kelvinToCelsius = (kelvin: number) => Math.round(kelvin - 273.15);
 
 export const kelvinToFahrenheit = (kelvin: number) => Math.round((kelvin - 273.15) * 9/5 + 32);
 
-export const metersToFeet = (meters: number) => Math.round(meters * 3.281);
+export const metersPerSecondToMilesPerHour = (mps: number) => Math.round(mps * 2.237);

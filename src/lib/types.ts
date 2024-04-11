@@ -11,4 +11,5 @@ export type City = {
 
 export type SearchParams = {
   city: string;
+  units?: 'metric' | 'imperial';
 }

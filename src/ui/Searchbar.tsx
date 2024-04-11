@@ -1,13 +1,11 @@
 'use client';
 
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {fetchCityFromList } from '@/lib/data'
 import type { City } from '@/lib/types'
-import { json } from 'stream/consumers';
-
+import { cn } from "@/lib/utils"
 
 export default function Searchbar() {
   const searchParams = useSearchParams()
@@ -18,8 +16,10 @@ export default function Searchbar() {
 
   const handleSearch = useDebouncedCallback(async (term: string) => {
     const response = await fetchCityFromList(term) as City[];
+    if (term === '') return;
     setCities(response);
   }, 300);
+
 
   const handleSelect = (id: number) => {
     const params = new URLSearchParams(searchParams);
@@ -29,29 +29,46 @@ export default function Searchbar() {
     setCities([]);
     inputRef.current && (inputRef.current.value = '');
   };
-  return (
-    <>
-    <div className="relative flex flex-1 flex-shrink-0">
-      <label htmlFor="search" className="sr-only">
-        Search
-      </label>
-      <input
-        ref={inputRef}
-        className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-        placeholder="Search for a city"
-        id="citySearch"
-        onChange={(e) => handleSearch(e.target.value)}
-      />
-      <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-      <br />
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setCities([]);
+      inputRef.current && (inputRef.current.value = '');
+    }
+  };
+
+  useEffect(() => {
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  return (
+    <div className="ml-auto max-w-xs w-full">
+      <div className="rounded-md bg-gray-100">
+        <input
+          title='search'
+          className={cn(
+            "flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          )}
+          ref={inputRef}
+          id="citySearch"
+          placeholder="Enter your location" type="text"
+          onChange={(e) => handleSearch(e.target.value)}
+        />
     </div>
-    <ul className='p-2 rounded-lg border border-gray-200 shadow'>
-    {cities.map((city: City, idx: number) => (
-      <li key={city.id} onClick={()=>handleSelect(city.id)}
-      className='flex p-2 items-center  hover:bg-gray-100 cursor-pointer'>{city.name} {city.state} {city.country}</li>
-    ))}
-  </ul>
-  </>
+    <div id="dropdown" className={cn("absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-80", !cities.length  && "hidden")}>
+      <ul className="py-2 text-sm text-gray-700 ">
+      {cities.map((city: City) => (
+          <li key={city.id} onClick={()=>handleSelect(city.id)}
+          className="block w-full px-4 py-2 hover:bg-gray-100 cursor-pointer">{city.name} {city.state} {city.country}</li>
+        ))}
+
+      </ul>
+    </div>
+  </div>
   );
 }

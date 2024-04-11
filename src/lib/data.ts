@@ -1,7 +1,6 @@
 'use server';
-import cities from "./city.list.json";
+
 import sqlite3 from "sqlite3";
-import type { City } from "./types";
 
 
 export async function fetchDaily(id: number) {
@@ -18,7 +17,7 @@ export async function fetchCityFromList(name: string){
   const db = new sqlite3.Database('./mydb.sqlite3', sqlite3.OPEN_READONLY);
   const query = `SELECT * FROM cities WHERE name LIKE '%${name}%' LIMIT 5`;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, _reject) => {
     db.all(query, (err, rows) => {
       if (err) {
         resolve([]);
