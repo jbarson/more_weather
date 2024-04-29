@@ -25,7 +25,7 @@ export default async function CityWeather({id}: {id: number}) {
       <div className="flex items-center gap-4">
         <Image
           alt={weather[0].description}
-          className="rounded-full overflow-hidden ring"
+          className="rounded-full overflow-hidden ring bg-gray-300"
           height="100"
           src={`https://openweathermap.org/img/wn/${icon}.png`}
           style={{

@@ -1,9 +1,7 @@
 'use client';
 
-function error() {
+export default function error() {
   return (
-    <p>Error fetching data</p>
+    <p className="text-center">Error fetching data</p>
   )
 }
-
-export default error

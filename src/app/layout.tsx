@@ -1,9 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Head } from "next";
 import { Inter } from "next/font/google";
 import Header from "@/ui/Header";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  // weight: ['400', '600']
+  variable: '--font-inter',
+});
 
 export const metadata: Metadata = {
   title: "Yet Another Weather Widget",
@@ -17,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className}`}>
+      <body className={`${inter.variable} font-sans`}>
         <main className="px-4 md:px-6 lg:px-8 grid gap-4">
         <Header />
 
